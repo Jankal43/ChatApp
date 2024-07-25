@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  padding-bottom: 20px; 
+  box-sizing: border-box;
+  overflow: hidden; 
+
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+.userPFP {
+  background: lightblue;
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+}
+
+body {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  grid-template-rows: 1fr 2fr 2fr;
+  gap: 0px; 
+  
+}
+
+.userBlock {
+  grid-column: 1 / 2;
+  grid-row: 1 / 4;
+}
+
+.navBar {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mainScreen {
+  grid-column: 2 / 3;
+  grid-row: 2 / 4;
+}
+
+.userDescription,
+.appDescription {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.buttonsLayout {
+  display: flex;
+  justify-content: space-evenly;
+  flex-direction: row;
+  align-items: center; 
+  width: 100%; 
+}
