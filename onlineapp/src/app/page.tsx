@@ -1,12 +1,6 @@
 "use client"
-
-
 import React, { useState, useEffect } from 'react';
-import io from 'socket.io-client';
-
-const socket = io('http://localhost:3001'); 
-
-
+import socket from '../socket';
 
 export default function Home() {
   const [messages, setMessages] = useState([]);
@@ -25,7 +19,7 @@ export default function Home() {
   };
 
   return (
-    <div>
+    <div className='bg-gray-900 m-1 p-5 h-dvh'>
       <h1>Real-Time Chat</h1>
       <div>
         {messages.map((message, index) => (
