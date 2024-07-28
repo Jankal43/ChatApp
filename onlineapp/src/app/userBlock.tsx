@@ -1,6 +1,6 @@
 "use client"
 import socket from '@/socket';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export default function UserBlock(){
     
@@ -15,16 +15,23 @@ export default function UserBlock(){
     const handleButtonClick = () => {
         if(userNickname === ''){
             connectSocket();
-            setUserNickname(inputValue);      
+            setUserNickname(inputValue);   
+          
            
         }
         else{
             setUserNickname('')
             console.log(socket.id)
             disconnectSocket();
-            
         }
     }
+    useEffect(() => {
+        if (userNickname !== '') {
+            socket.emit('user-nickname', userNickname);
+            console.log('Emitting user-nickname:', userNickname);
+        }
+    });
+    
     const connectSocket = () => {
         if (!isConnected) {
             socket.connect();
@@ -32,7 +39,7 @@ export default function UserBlock(){
             
             socket.on('connect', () => {
                 console.log('connected to server');
-                console.log(socket.id) 
+                // console.log(socket.id) 
             });
 
             socket.on('disconnect', () => {
@@ -58,7 +65,7 @@ export default function UserBlock(){
                     {userNickname === '' ? (
                         <div className='flex flex-col items-center'>
                             <input 
-                                className="inputUserName text-slate-950" 
+                                className="inputUserName bg-gray-800 border" 
                                 value={inputValue} 
                                 onChange={handleInputChange}
                             /><br />

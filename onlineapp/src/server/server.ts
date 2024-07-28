@@ -14,19 +14,16 @@ const io = new SocketIOServer(server, {
 
 io.on('connection', (socket: Socket) => {
   console.log('A user connected');
-  console.log(socket.id)
+  console.log(socket.id);
 
-
-  socket.on('chat message', (message: string) => {
-    io.emit('chat message', message); 
+  socket.on('user-nickname', (nick: string) => {
+    console.log('Received nickname:', nick);
   });
 
   socket.on('disconnect', () => {
-    console.log(socket.id)
-    console.log('A user disconnected');
+    console.log('A user disconnected', socket.id);
   });
 });
-
 
 server.listen(3001, () => {
   console.log('WebSocket server listening on port 3001');
