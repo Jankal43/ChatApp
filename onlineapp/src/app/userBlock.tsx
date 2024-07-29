@@ -71,15 +71,15 @@ export default function UserBlock(){
                             /><br />
                             <button 
                                 onClick={handleButtonClick} 
-                                className="disconnectButton bg-black p-2"
+                                className="disconnectButton bg-green-900 hover:bg-green-700 text-white font-semibold py-2 p-3 border shadow"
                             >
                                 Connect
                             </button>
                         </div>
                     ) : (
                         <div className="userName">
-                            <p className='text-center'>{userNickname} </p>
-                            <button  onClick={handleButtonClick} className='bg-black m-2 p-2'>Disconnect</button>
+                            <p className='text-center' id='username'>{userNickname} </p>
+                            <button  onClick={handleButtonClick} className='bg-red-900 hover:bg-red-700 text-white font-semibold py-2 p-3 border shadow'>Disconnect</button>
                         </div>
                     )}
             </div>
