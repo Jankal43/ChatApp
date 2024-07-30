@@ -2,7 +2,7 @@
 import socket from '@/socket';
 import React, { useEffect, useState } from 'react';
 
-export default function UserBlock(){
+export default function UserBlock(props: any){
     
     const [userNickname, setUserNickname] = useState('');
     const [inputValue, setInputValue] = useState('');
@@ -15,7 +15,8 @@ export default function UserBlock(){
     const handleButtonClick = () => {
         if(userNickname === ''){
             connectSocket();
-            setUserNickname(inputValue);   
+            setUserNickname(inputValue);
+            props.setIsLoggedIn(true)   
           
            
         }
@@ -23,6 +24,7 @@ export default function UserBlock(){
             setUserNickname('')
             console.log(socket.id)
             disconnectSocket();
+            props.setIsLoggedIn(false) 
         }
     }
     useEffect(() => {
