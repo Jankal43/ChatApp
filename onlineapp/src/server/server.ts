@@ -30,8 +30,8 @@ io.on('connection', (socket: Socket) => {
     activeUsers[id] = nick;
 
     console.log("active users", activeUsers);
-    io.emit('user-connected', nick);  
     io.emit('active-users', activeUsers);
+    
     console.log("emitting active users");
 });
 
@@ -48,7 +48,7 @@ io.on('connection', (socket: Socket) => {
     console.log('A user disconnected', socket.id);
     delete activeUsers[socket.id];
     console.log("active users", activeUsers)
-    socket.emit("active-users", activeUsers)
+    io.emit("active-users",  activeUsers)
   });
 });
 

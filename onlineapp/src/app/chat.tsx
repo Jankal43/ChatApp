@@ -3,7 +3,14 @@ import socket from '../socket';
 
 export default function Chat() {
 
-    const [usersList, setUsersList] = useState({});
+    
+    type UsersListType = {
+        [key: string]: string;
+      };
+    
+      const [usersList, setUsersList] = useState<UsersListType>({});
+
+
     
     function sendMessage() {
         const messageInput = document.getElementById('messageInput') as HTMLInputElement;
@@ -32,18 +39,17 @@ export default function Chat() {
     }, []);
 
 
-    useEffect(()=>{
-        const handleReciveUser = (user:any) =>{
-            console.log("user",user)
-            // setUsersList(data.users)
-            // displayUsers(data.users)
-            
+    useEffect(() => {
+        const handleReciveUsers = (users: any) => {
+            console.log(users)
+            setUsersList(users)
+
         };
-        socket.on('user-connected', handleReciveUser);
+        socket.on('active-users', handleReciveUsers);
         return () => {
-            socket.off("user-connected", handleReciveUser);
+            socket.off("active-users", handleReciveUsers);
         };
-    },[]);
+    }, []);
 
     function displayMessage(message: string, user: string) {
         const div = document.createElement("div");
@@ -77,7 +83,9 @@ export default function Chat() {
                     {/* messages from serwer */}
                 </div>
                 <div id='userBox' className="usersBox bg-slate-800 w-1/6 p-2 m-2">
-                    userBox
+                     {Object.keys(usersList).map(key => (
+                        <div key={key}>{usersList[key]}</div>
+                    ))}
                 </div>
             </div>
             <div className="inputArea flex flex-row h-1/6">
