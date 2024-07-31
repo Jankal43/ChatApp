@@ -1,8 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import socket from '../socket';
 
 export default function Chat() {
 
+    const [usersList, setUsersList] = useState({});
+    
     function sendMessage() {
         const messageInput = document.getElementById('messageInput') as HTMLInputElement;
         const receiverInput = document.getElementById('reciverInput') as HTMLInputElement;
@@ -14,7 +16,7 @@ export default function Chat() {
             const receiver = receiverInput.value;
 
             socket.emit('send-message', { message, receiver, user });
-            messageInput.value = ''; // Clear the input after sending
+            messageInput.value = '';
         }
     }
 
@@ -24,12 +26,24 @@ export default function Chat() {
         };
 
         socket.on("recive-message", handleReceiveMessage);
-
-        // Cleanup function to remove the event listener when component unmounts
         return () => {
             socket.off("recive-message", handleReceiveMessage);
         };
     }, []);
+
+
+    useEffect(()=>{
+        const handleReciveUser = (user:any) =>{
+            console.log("user",user)
+            // setUsersList(data.users)
+            // displayUsers(data.users)
+            
+        };
+        socket.on('user-connected', handleReciveUser);
+        return () => {
+            socket.off("user-connected", handleReciveUser);
+        };
+    },[]);
 
     function displayMessage(message: string, user: string) {
         const div = document.createElement("div");
@@ -37,13 +51,32 @@ export default function Chat() {
         document.getElementById("chatBox")?.append(div);
     }
 
+    
+
+    
+    // function displayUsers(user:string) {
+    //     const div = document.createElement("div");
+    //     div.textContent = `${user}`;
+    //     document.getElementById("userBox")?.append(div);
+    // }
+
+
+
+    // socket.on("active-users", (users: string[]) => {
+    //     console.log("Users", users);
+    //     for (let key in users) {
+    //         console.log(`${key}: ${users[key]}`);
+    //         // displayUsers(users[key])
+    //     }
+    // });
+
     return (
         <div className="p-2 m-2 h-screen">
             <div className="messagesArea flex flex-row h-4/6">
                 <div id='chatBox' className="chatBox bg-slate-800 w-5/6 p-2 m-2">
-                    chatBox
+                    {/* messages from serwer */}
                 </div>
-                <div className="usersBox bg-slate-800 w-1/6 p-2 m-2">
+                <div id='userBox' className="usersBox bg-slate-800 w-1/6 p-2 m-2">
                     userBox
                 </div>
             </div>

@@ -22,26 +22,27 @@ export default function UserBlock(props: any){
         }
         else{
             setUserNickname('')
-            console.log(socket.id)
+            // console.log(socket.id)
             disconnectSocket();
             props.setIsLoggedIn(false) 
         }
     }
     useEffect(() => {
-        if (userNickname !== '') {
-            socket.emit('user-nickname', userNickname);
-            console.log('Emitting user-nickname:', userNickname);
+        if (userNickname !== '' && isConnected) {
+            socket.emit('user-nickname', userNickname, socket.id);
+            // console.log('Emitting user-nickname:', userNickname, socket.id);
         }
-    });
+    }, [userNickname, isConnected]);
     
     const connectSocket = () => {
         if (!isConnected) {
             socket.connect();
-            setIsConnected(true);
+          
             
             socket.on('connect', () => {
                 console.log('connected to server');
                 // console.log(socket.id) 
+                setIsConnected(true);
             });
 
             socket.on('disconnect', () => {
@@ -54,7 +55,7 @@ export default function UserBlock(props: any){
     const disconnectSocket = () => {
         if (isConnected) {
             socket.disconnect();
-            console.log('disconnected');
+            // console.log('disconnected');
             setIsConnected(false);
         }
     };
