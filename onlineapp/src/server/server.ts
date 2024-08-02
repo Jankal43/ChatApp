@@ -46,24 +46,25 @@ io.on('connection', (socket: Socket) => {
 
 
 
-  socket.on('send-message', ({ message, user }) => {
+socket.on('send-message', ({ message, user }) => {
   console.log('Received message:', message, 'from user:', user);
-  io.emit('recive-message', { message, user });
-  });
+  socket.broadcast.emit('recive-message', { message, user });
+});
 
 
 
-   socket.on('private-message', ({ message, receiver, user }) => {
+
+  socket.on('private-message', ({ message, receiver, user }) => {
     console.log('Received private message:', message, 'for receiver:', receiver, 'from user:', user);
     const receiverSocketId = findKeyByValue(activeUsers, receiver);
+    const userId = socket.id;
     if (receiverSocketId) {
       console.log('Sending private message to socket ID:', receiverSocketId);
-      io.to(receiverSocketId).emit('recive-message', { message, user });
+      socket.in(receiverSocketId).emit('recive-message', { message, user });
     } else {
       console.log('Receiver not found');
     }
   });
-
 
   socket.on('disconnect', () => {
     console.log('A user disconnected', socket.id);

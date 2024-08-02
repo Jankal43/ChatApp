@@ -12,15 +12,19 @@ export default function Chat() {
 
 
     
-      function sendMessage() {
+    function sendMessage() {
         const messageInput = document.getElementById('messageInput') as HTMLInputElement;
         const receiverInput = document.getElementById('reciverInput') as HTMLInputElement;
         const userElement = document.getElementById('username');
         const user = userElement ? userElement.textContent : '';
+        const message = messageInput.value;
+        const receiver = receiverInput.value;
+        
+        displayMessage(message, user)
+       
     
         if (messageInput && receiverInput) {
-            const message = messageInput.value;
-            const receiver = receiverInput.value;
+            
     
             console.log('receiver', receiver);
             console.log('message', message);
