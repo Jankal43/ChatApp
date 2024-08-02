@@ -12,23 +12,36 @@ export default function Chat() {
 
 
     
-    function sendMessage() {
+      function sendMessage() {
         const messageInput = document.getElementById('messageInput') as HTMLInputElement;
         const receiverInput = document.getElementById('reciverInput') as HTMLInputElement;
         const userElement = document.getElementById('username');
         const user = userElement ? userElement.textContent : '';
-
+    
         if (messageInput && receiverInput) {
             const message = messageInput.value;
             const receiver = receiverInput.value;
-
-            socket.emit('send-message', { message, receiver, user });
+    
+            console.log('receiver', receiver);
+            console.log('message', message);
+    
+            if (message === '') {
+                return;
+            }
+    
+            if (receiver === '') {
+                socket.emit('send-message', { message, user });
+            } else {
+                socket.emit('private-message', { message, receiver, user });
+            }
+    
             messageInput.value = '';
         }
     }
 
     useEffect(() => {
         const handleReceiveMessage = (data: any) => {
+            console.log("Mssage recived",data.message, data.user)
             displayMessage(data.message, data.user);
         };
 
@@ -59,28 +72,12 @@ export default function Chat() {
 
     
 
-    
-    // function displayUsers(user:string) {
-    //     const div = document.createElement("div");
-    //     div.textContent = `${user}`;
-    //     document.getElementById("userBox")?.append(div);
-    // }
-
-
-
-    // socket.on("active-users", (users: string[]) => {
-    //     console.log("Users", users);
-    //     for (let key in users) {
-    //         console.log(`${key}: ${users[key]}`);
-    //         // displayUsers(users[key])
-    //     }
-    // });
 
     return (
         <div className="p-2 m-2 h-screen">
             <div className="messagesArea flex flex-row h-4/6">
                 <div id='chatBox' className="chatBox bg-slate-800 w-5/6 p-2 m-2">
-                    {/* messages from serwer */}
+                    {/* messages from server */}
                 </div>
                 <div id='userBox' className="usersBox bg-slate-800 w-1/6 p-2 m-2">
                      {Object.keys(usersList).map(key => (

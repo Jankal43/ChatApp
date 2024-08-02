@@ -11,6 +11,15 @@ type UserDictionary = {
 
 let activeUsers: UserDictionary = {};
 
+function findKeyByValue(dictionary: UserDictionary, value: string): string | undefined {
+  for (const key in dictionary) {
+    if (dictionary[key] === value) {
+      return key;
+    }
+  }
+  return undefined;
+}
+
 
 const io = new SocketIOServer(server, {
   cors: {
@@ -37,11 +46,23 @@ io.on('connection', (socket: Socket) => {
 
 
 
-  socket.on('send-message', ({ message, receiver, user }) => {
-    console.log('Received message:', message, 'for receiver:', receiver, 'from user:', user);
-    io.emit('recive-message', { message, user });
+  socket.on('send-message', ({ message, user }) => {
+  console.log('Received message:', message, 'from user:', user);
+  io.emit('recive-message', { message, user });
   });
 
+
+
+   socket.on('private-message', ({ message, receiver, user }) => {
+    console.log('Received private message:', message, 'for receiver:', receiver, 'from user:', user);
+    const receiverSocketId = findKeyByValue(activeUsers, receiver);
+    if (receiverSocketId) {
+      console.log('Sending private message to socket ID:', receiverSocketId);
+      io.to(receiverSocketId).emit('recive-message', { message, user });
+    } else {
+      console.log('Receiver not found');
+    }
+  });
 
 
   socket.on('disconnect', () => {
