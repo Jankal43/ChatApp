@@ -74,6 +74,15 @@ export default function Chat() {
         document.getElementById("chatBox")?.append(div);
     }
 
+    function getUserName(userName: string) {
+        const reciverInputElement = document.getElementById('reciverInput') as HTMLInputElement;
+        if (reciverInputElement) {
+            reciverInputElement.value = userName;
+        } else {
+            console.error("Element with id 'reciverInput' not found");
+        }
+    }
+
     
 
 
@@ -85,7 +94,7 @@ export default function Chat() {
                 </div>
                 <div id='userBox' className="usersBox bg-slate-800 w-1/6 p-2 m-2">
                      {Object.keys(usersList).map(key => (
-                        <div key={key}>{usersList[key]}</div>
+                        <div id={key} key={key} onClick={() => getUserName(usersList[key])}>{usersList[key]}</div>
                     ))}
                 </div>
             </div>
