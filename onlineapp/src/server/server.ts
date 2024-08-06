@@ -60,7 +60,7 @@ socket.on('send-message', ({ message, user }) => {
     const userId = socket.id;
     if (receiverSocketId) {
       console.log('Sending private message to socket ID:', receiverSocketId);
-      socket.in(receiverSocketId).emit('recive-message', { message, user });
+      socket.in(receiverSocketId).emit('recive-message', { message, user,receiver });
     } else {
       console.log('Receiver not found');
     }

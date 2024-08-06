@@ -20,22 +20,23 @@ export default function Chat() {
         const message = messageInput.value;
         const receiver = receiverInput.value;
         
-        displayMessage(message, user)
+        
        
     
         if (messageInput && receiverInput) {
             
     
-            console.log('receiver', receiver);
-            console.log('message', message);
+        
     
             if (message === '') {
                 return;
             }
     
             if (receiver === '') {
+                displayMessage(message, user, false)
                 socket.emit('send-message', { message, user });
             } else {
+                displayMessage(message, user, true)
                 socket.emit('private-message', { message, receiver, user });
             }
     
@@ -45,8 +46,16 @@ export default function Chat() {
 
     useEffect(() => {
         const handleReceiveMessage = (data: any) => {
-            console.log("Mssage recived",data.message, data.user)
-            displayMessage(data.message, data.user);
+            if(data.receiver){
+                console.log("Mssage recived",data.message, data.user)
+                displayMessage(data.message, data.user, true);
+            }
+            else{
+                console.log("Mssage recived",data.message, data.user)
+                displayMessage(data.message, data.user, false);
+            }
+           
+        
         };
 
         socket.on("recive-message", handleReceiveMessage);
@@ -58,7 +67,7 @@ export default function Chat() {
 
     useEffect(() => {
         const handleReciveUsers = (users: any) => {
-            console.log(users)
+      
             setUsersList(users)
 
         };
@@ -68,11 +77,20 @@ export default function Chat() {
         };
     }, []);
 
-    function displayMessage(message: string, user: string) {
+    function displayMessage(message: string, user: string, isPrivate: boolean) {
         const div = document.createElement("div");
-        div.textContent = `${user}: ${message}`;
-        document.getElementById("chatBox")?.append(div);
+        
+    
+        if (isPrivate) {
+            div.textContent = `(Private message) ${user}: ${message}`;
+            div.classList.add('bg-slate-900');
+            document.getElementById("chatBox")?.append(div);
+        } else {
+            div.textContent = `${user}: ${message}`;
+            document.getElementById("chatBox")?.append(div);
+        }
     }
+    
 
     function getUserName(userName: string) {
         const reciverInputElement = document.getElementById('reciverInput') as HTMLInputElement;
@@ -90,7 +108,6 @@ export default function Chat() {
         <div className="p-2 m-2 h-screen">
             <div className="messagesArea flex flex-row h-4/6">
                 <div id='chatBox' className="chatBox bg-slate-800 w-5/6 p-2 m-2">
-                    {/* messages from server */}
                 </div>
                 <div id='userBox' className="usersBox bg-slate-800 w-1/6 p-2 m-2">
                      {Object.keys(usersList).map(key => (
