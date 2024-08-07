@@ -22,7 +22,6 @@ export default function UserBlock(props: any){
         }
         else{
             setUserNickname('')
-            // console.log(socket.id)
             disconnectSocket();
             props.setIsLoggedIn(false) 
         }
@@ -30,7 +29,6 @@ export default function UserBlock(props: any){
     useEffect(() => {
         if (userNickname !== '' && isConnected) {
             socket.emit('user-nickname', userNickname, socket.id);
-            // console.log('Emitting user-nickname:', userNickname, socket.id);
         }
     }, [userNickname, isConnected]);
     
@@ -41,7 +39,6 @@ export default function UserBlock(props: any){
             
             socket.on('connect', () => {
                 console.log('connected to server');
-                // console.log(socket.id) 
                 setIsConnected(true);
             });
 
@@ -55,7 +52,6 @@ export default function UserBlock(props: any){
     const disconnectSocket = () => {
         if (isConnected) {
             socket.disconnect();
-            // console.log('disconnected');
             setIsConnected(false);
         }
     };

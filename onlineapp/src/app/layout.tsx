@@ -26,11 +26,12 @@ export default function RootLayout({
         <UserBlock setIsLoggedIn={setIsLoggedIn}/>
         <NavBar/>
         
-        {isLoggedIn ? (
+        {/* {isLoggedIn ? (
           <>{children}</>
         ) : (
           <p className="h-screen bg-gray-900 p-2 m-2">You have to log in</p>
-        )}
+        )} */}
+        {children}
         
        
       </body>
