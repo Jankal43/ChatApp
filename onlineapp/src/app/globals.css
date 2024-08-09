@@ -2,14 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   padding: 0;
-  padding-bottom: 20px; 
+  padding-bottom: 20px;
   box-sizing: border-box;
-  overflow: hidden; 
-
+  overflow: hidden;
 }
 
 *,
@@ -29,8 +29,7 @@ body {
   display: grid;
   grid-template-columns: 1fr 2fr;
   grid-template-rows: 1fr 2fr 2fr;
-  gap: 0px; 
-  
+  gap: 0px;
 }
 
 .userBlock {
@@ -63,6 +62,22 @@ body {
   display: flex;
   justify-content: space-evenly;
   flex-direction: row;
-  align-items: center; 
-  width: 100%; 
+  align-items: center;
+  width: 100%;
+}
+
+.paintContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.toolBar ul {
+  padding-left: 20px; /* Dodaje wcięcie po lewej stronie listy */
+  list-style-position: inside; /* Ustawia pozycję punktów na liście wewnątrz wcięcia */
+}
+
+.toolBar li {
+  margin-bottom: 5px; /* Opcjonalnie, aby dodać przestrzeń między elementami listy */
+  color: white; /* Kolor tekstu dla lepszej widoczności */
 }
