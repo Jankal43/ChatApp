@@ -73,11 +73,11 @@ body {
 }
 
 .toolBar ul {
-  padding-left: 20px; /* Dodaje wcięcie po lewej stronie listy */
-  list-style-position: inside; /* Ustawia pozycję punktów na liście wewnątrz wcięcia */
+  padding-left: 20px;
+  list-style-position: inside;
 }
 
 .toolBar li {
-  margin-bottom: 5px; /* Opcjonalnie, aby dodać przestrzeń między elementami listy */
-  color: white; /* Kolor tekstu dla lepszej widoczności */
+  margin-bottom: 5px;
+  color: white;
 }

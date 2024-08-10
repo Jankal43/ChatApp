@@ -49,6 +49,10 @@ io.on("connection", (socket: Socket) => {
     console.log("Received message:", message, "from user:", user);
     socket.broadcast.emit("recive-message", { message, user });
   });
+  socket.on("send-image", (blob) => {
+    // console.log("blob", blob);
+    socket.broadcast.emit("recive-image", { blob });
+  });
 
   socket.on("private-message", ({ message, receiver, user }) => {
     console.log(
