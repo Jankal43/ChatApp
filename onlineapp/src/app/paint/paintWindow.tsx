@@ -1,49 +1,11 @@
 "use client";
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import socket from "../../socket";
+import ToolBar from "./toolBar";
 export default function PaintWindow() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const socketRef = useRef<WebSocket | null>(null);
 
-  // useEffect(() => {
-  //   const handleReceiveImage = (data: any) => {
-  //     // Sprawdź strukturę danych
-  //     console.log("Otrzymane dane:", data);
-
-  //     // Wyodrębnij Blob z odpowiedniego miejsca
-  //     const blobData = data.blob?.blob; // Wyciągamy właściwy blob
-
-  //     // Upewnij się, że blobData jest rzeczywiście instancją Blob
-  //     if (blobData instanceof Blob) {
-  //       const canvas = canvasRef.current;
-  //       const context = canvas?.getContext("2d");
-
-  //       if (canvas && context) {
-  //         const img = new Image();
-  //         img.onload = () => {
-  //           // Wyczyszczenie canvas przed rysowaniem nowego obrazu
-  //           context.clearRect(0, 0, canvas.width, canvas.height);
-  //           context.drawImage(img, 0, 0);
-  //         };
-
-  //         // Tworzenie obiektu URL tylko jeśli blobData jest prawidłowy
-  //         const objectURL = URL.createObjectURL(blobData);
-  //         img.src = objectURL;
-
-  //         // Zwolnienie URL po załadowaniu obrazu
-  //         img.onload = () => {
-  //           URL.revokeObjectURL(objectURL);
-  //         };
-  //       }
-  //     } else {
-  //       console.error("Otrzymany obiekt nie jest typu Blob", blobData);
-  //     }
-  //   };
-  //   socket.on("recive-image", handleReceiveImage);
-  //   return () => {
-  //     socket.off("recive-image", handleReceiveImage);
-  //   };
-  // }, []);
+  const [toolSelectet, setToolSelectet] = useState("");
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -71,7 +33,6 @@ export default function PaintWindow() {
         const stopDrawing = () => {
           isDrawing = false;
           context.closePath();
-          // Wysyłanie danych canvy po zakończeniu rysowania
           sendCanvasData();
         };
 
@@ -79,12 +40,34 @@ export default function PaintWindow() {
           if (canvasRef.current) {
             canvasRef.current.toBlob((blob) => {
               if (blob) {
-                // console.log("blob", blob);
                 socket.emit("send-image", { blob });
               }
             });
           }
         };
+
+        socket.on("recive-image", ({ blob }) => {
+          if (blob instanceof Blob) {
+            const img = new Image();
+            const url = URL.createObjectURL(blob);
+            img.onload = () => {
+              context.drawImage(img, 0, 0);
+              URL.revokeObjectURL(url);
+            };
+            img.src = url;
+          } else if (blob instanceof ArrayBuffer) {
+            const blobObject = new Blob([blob], { type: "image/png" });
+            const img = new Image();
+            const url = URL.createObjectURL(blobObject);
+            img.onload = () => {
+              context.drawImage(img, 0, 0);
+              URL.revokeObjectURL(url);
+            };
+            img.src = url;
+          } else {
+            console.error("Received an unknown type, cannot create URL.");
+          }
+        });
 
         canvas.addEventListener("mousedown", startDrawing);
         canvas.addEventListener("mousemove", draw);
@@ -102,8 +85,11 @@ export default function PaintWindow() {
   }, []);
 
   return (
-    <div className="h-5/6 w-5/6 bg-white p-5 m-5 pl-0 ml-0">
-      <canvas ref={canvasRef} className="h-full w-full"></canvas>
+    <div className="paintContainer bg-gray-900 m-1 h-screen">
+      <ToolBar />
+      <div className="h-5/6 w-5/6 bg-white p-5 m-5 pl-0 ml-0">
+        <canvas ref={canvasRef} className="h-full w-full"></canvas>
+      </div>
     </div>
   );
 }
