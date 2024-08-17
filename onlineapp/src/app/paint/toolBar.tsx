@@ -32,37 +32,45 @@ export default function ToolBar({
         <p className="text-xl font-bold pb-2 flex items-center">Tool Bar</p>
 
         <label>Shapes:</label>
-        <ul>
-          <li
-              onClick={() => setToolSelected("Rectangle")}
-              id="Rectangle"
-              className="flex items-center transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-105 duration-300"
-          >
-            Rectangle ▭
-          </li>
-          <li
-              onClick={() => setToolSelected("Circle")}
-              className="flex items-center transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300"
-              id="Circle"
-          >
-            Circle ◯
-          </li>
-          <li
-              onClick={() => setToolSelected("Triangle")}
-              className="flex items-center transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300"
-              id="Triangle"
-          >
-            Triangle △
-          </li>
-        </ul>
+          <ul>
+              <li
+                  onClick={() => setToolSelected("Line")}
+                  className="flex items-center transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300"
+                  id="Line"
+              >
+                  Line \
+              </li>
+              <li
+                  onClick={() => setToolSelected("Rectangle")}
+                  id="Rectangle"
+                  className="flex items-center transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-105 duration-300"
+              >
+                  Rectangle ▭
+              </li>
+              <li
+                  onClick={() => setToolSelected("Circle")}
+                  className="flex items-center transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300"
+                  id="Circle"
+              >
+                  Circle ◯
+              </li>
+              <li
+                  onClick={() => setToolSelected("Triangle")}
+                  className="flex items-center transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300"
+                  id="Triangle"
+              >
+                  Triangle △
+              </li>
 
-        <label>Options:</label>
-        <ul>
-          <li
-              onClick={() => setToolSelected("Brush")}
-              className="flex items-center transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300"
-              id="Brush"
-          >
+          </ul>
+
+          <label>Options:</label>
+          <ul>
+              <li
+                  onClick={() => setToolSelected("Brush")}
+                  className="flex items-center transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300"
+                  id="Brush"
+              >
             Brush
           </li>
           <li

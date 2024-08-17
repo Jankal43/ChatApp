@@ -1,4 +1,3 @@
-"use client";
 import React, { useEffect, useRef } from "react";
 import socket from "../../socket";
 
@@ -12,6 +11,10 @@ export default function PaintWindow({ toolSelected, colorSelected }: PaintWindow
     const toolRef = useRef(toolSelected);
     const colorRef = useRef(colorSelected);
 
+    const startX = useRef<number>(0);
+    const startY = useRef<number>(0);
+    const isDrawingRef = useRef<boolean>(false);
+    const imageDataRef = useRef<ImageData | null>(null);
 
     useEffect(() => {
         toolRef.current = toolSelected;
@@ -20,37 +23,94 @@ export default function PaintWindow({ toolSelected, colorSelected }: PaintWindow
 
     useEffect(() => {
         const canvas = canvasRef.current;
-        let isDrawing = false;
 
         if (canvas) {
-            const context = canvas.getContext("2d");
+            const context = canvas.getContext("2d", { willReadFrequently: true });
+
 
             if (context) {
                 canvas.width = canvas.offsetWidth;
                 canvas.height = canvas.offsetHeight;
 
                 const startDrawing = (e: MouseEvent) => {
-                    isDrawing = true;
-                    context.beginPath();
-                    context.moveTo(e.offsetX, e.offsetY);
+                    isDrawingRef.current = true;
+                    startX.current = e.offsetX;
+                    startY.current = e.offsetY;
+
+                    if (toolRef.current === "Line" || toolRef.current === "Rectangle" || toolRef.current === "Triangle" || toolRef.current==="Circle") {
+                        imageDataRef.current = context.getImageData(0, 0, canvas.width, canvas.height);
+                    } else {
+                        context.beginPath();
+                        context.moveTo(e.offsetX, e.offsetY);
+                    }
                 };
 
                 const draw = (e: MouseEvent) => {
-                    if (!isDrawing) return;
+                    if (!isDrawingRef.current) return;
 
-                    context.strokeStyle = colorRef.current;
                     if (toolRef.current === "Brush") {
+                        context.strokeStyle = colorRef.current;
                         context.lineTo(e.offsetX, e.offsetY);
                         context.stroke();
                     } else if (toolRef.current === "Eraser") {
-                        context.clearRect(e.offsetX - 5, e.offsetY - 5, 10, 10);
+                        context.strokeStyle = "white";
+                        context.lineTo(e.offsetX, e.offsetY);
+                        context.stroke();
+                    } else if (toolRef.current === "Line") {
+                        if (imageDataRef.current) {
+                            context.putImageData(imageDataRef.current, 0, 0);
+                        }
+                        context.beginPath();
+                        context.moveTo(startX.current, startY.current);
+                        context.lineTo(e.offsetX, e.offsetY);
+                        context.strokeStyle = colorRef.current;
+                        context.stroke();
+                        context.closePath();
+                    } else if (toolRef.current === "Rectangle") {
+                        if (imageDataRef.current) {
+                            context.putImageData(imageDataRef.current, 0, 0);
+                        }
+                        context.beginPath();
+                        context.moveTo(startX.current, startY.current);
+                        context.lineTo(e.offsetX, startY.current);
+                        context.lineTo(e.offsetX, e.offsetY);
+                        context.lineTo(startX.current, e.offsetY);
+                        context.lineTo(startX.current, startY.current);
+                        context.strokeStyle = colorRef.current;
+                        context.stroke();
+                        context.closePath();
+                    }
+                    else if (toolRef.current === "Triangle") {
+                        if (imageDataRef.current) {
+                            context.putImageData(imageDataRef.current, 0, 0);
+                        }
+                        context.beginPath();
+                        context.moveTo((startX.current+e.offsetX)/2 , startY.current);
+                        context.lineTo(e.offsetX, e.offsetY);
+                        context.lineTo(e.offsetX, e.offsetY);
+                        context.lineTo(startX.current, e.offsetY);
+                        context.lineTo((startX.current+e.offsetX)/2 , startY.current);
+                        context.strokeStyle = colorRef.current;
+                        context.stroke();
+                        context.closePath();
+                    }
+                    else if (toolRef.current === "Circle") {
+                        if (imageDataRef.current) {
+                            context.putImageData(imageDataRef.current, 0, 0);
+                        }
+                        context.beginPath();
+                        context.arc(startX.current, startY.current, Math.abs(e.offsetY - startY.current),0,2 * Math.PI)
+                        context.strokeStyle = colorRef.current;
+                        context.stroke();
+                        context.closePath();
                     }
                 };
 
                 const stopDrawing = () => {
-                    isDrawing = false;
-                    context.closePath();
-                    sendCanvasData();
+                    if (isDrawingRef.current) {
+                        isDrawingRef.current = false;
+                        sendCanvasData();
+                    }
                 };
 
                 const sendCanvasData = () => {
