@@ -2,85 +2,26 @@ import React, { useEffect, useState } from 'react';
 import socket from '../socket';
 
 export default function Chat() {
-
-    
     type UsersListType = {
         [key: string]: string;
-      };
-    
-      const [usersList, setUsersList] = useState<UsersListType>({});
+    };
 
+    const [usersList, setUsersList] = useState<UsersListType>({});
 
-    
-    function sendMessage() {
-        const messageInput = document.getElementById('messageInput') as HTMLInputElement;
-        const receiverInput = document.getElementById('reciverInput') as HTMLInputElement;
-        const userElement = document.getElementById('username');
-        const user = userElement ? userElement.textContent || '' : '';
-        const message = messageInput.value;
-        const receiver = receiverInput.value;
-        
-        
-       
-    
-        if (messageInput && receiverInput) {
-            
-    
-        
-    
-            if (message === '') {
-                return;
-            }
-    
-            if (receiver === '') {
-                displayMessage(message, user, false)
-                socket.emit('send-message', { message, user });
-            } else {
-                displayMessage(message, user, true)
-                socket.emit('private-message', { message, receiver, user });
-            }
-    
-            messageInput.value = '';
+    function saveMessages(message: string, user: string, isPrivate: boolean) {
+        const existingMessages = JSON.parse(localStorage.getItem("messages") || "[]");
+
+        if (existingMessages.length >= 5) {
+            existingMessages.shift(); // Usuń najstarszą wiadomość
         }
+
+        existingMessages.push({ message, user, isPrivate });
+        localStorage.setItem("messages", JSON.stringify(existingMessages));
     }
-
-    useEffect(() => {
-        const handleReceiveMessage = (data: any) => {
-            if(data.receiver){
-                console.log("Mssage recived",data.message, data.user)
-                displayMessage(data.message, data.user, true);
-            }
-            else{
-                console.log("Mssage recived",data.message, data.user)
-                displayMessage(data.message, data.user, false);
-            }
-           
-        
-        };
-
-        socket.on("recive-message", handleReceiveMessage);
-        return () => {
-            socket.off("recive-message", handleReceiveMessage);
-        };
-    }, []);
-
-
-    useEffect(() => {
-        const handleReciveUsers = (users: any) => {
-      
-            setUsersList(users)
-
-        };
-        socket.on('active-users', handleReciveUsers);
-        return () => {
-            socket.off("active-users", handleReciveUsers);
-        };
-    }, []);
 
     function displayMessage(message: string, user: string, isPrivate: boolean) {
         const div = document.createElement("div");
-        
-    
+
         if (isPrivate) {
             div.textContent = `(Private message) ${user}: ${message}`;
             div.classList.add('bg-slate-900');
@@ -89,8 +30,10 @@ export default function Chat() {
             div.textContent = `${user}: ${message}`;
             document.getElementById("chatBox")?.append(div);
         }
+
+        // Zapisz wiadomość w localStorage
+        saveMessages(message, user, isPrivate);
     }
-    
 
     function getUserName(userName: string) {
         const reciverInputElement = document.getElementById('reciverInput') as HTMLInputElement;
@@ -101,8 +44,66 @@ export default function Chat() {
         }
     }
 
-    
+    function sendMessage() {
+        const messageInput = document.getElementById('messageInput') as HTMLInputElement;
+        const receiverInput = document.getElementById('reciverInput') as HTMLInputElement;
+        const userElement = document.getElementById('username');
+        const user = userElement ? userElement.textContent || '' : '';
+        const message = messageInput.value;
+        const receiver = receiverInput.value;
 
+        if (messageInput && receiverInput) {
+            if (message === '') {
+                return;
+            }
+
+            if (receiver === '') {
+                displayMessage(message, user, false);
+                socket.emit('send-message', { message, user });
+            } else {
+                displayMessage(message, user, true);
+                socket.emit('private-message', { message, receiver, user });
+            }
+
+            messageInput.value = '';
+        }
+    }
+
+    useEffect(() => {
+        const handleReceiveMessage = (data: any) => {
+            if (data.receiver) {
+                console.log("Message received", data.message, data.user);
+                displayMessage(data.message, data.user, true);
+            } else {
+                console.log("Message received", data.message, data.user);
+                displayMessage(data.message, data.user, false);
+            }
+        };
+
+        socket.on("recive-message", handleReceiveMessage);
+        return () => {
+            socket.off("recive-message", handleReceiveMessage);
+        };
+    }, []);
+
+    useEffect(() => {
+        const handleReceiveUsers = (users: any) => {
+            setUsersList(users);
+        };
+        socket.on('active-users', handleReceiveUsers);
+        return () => {
+            socket.off("active-users", handleReceiveUsers);
+        };
+    }, []);
+
+    useEffect(() => {
+        // Odczytaj zapisane wiadomości z localStorage po załadowaniu komponentu
+        const savedMessages = JSON.parse(localStorage.getItem("messages") || "[]");
+
+        savedMessages.forEach((msg: any) => {
+            displayMessage(msg.message, msg.user, msg.isPrivate);
+        });
+    }, []);
 
     return (
         <div className="p-2 m-2 h-screen">
@@ -110,14 +111,14 @@ export default function Chat() {
                 <div id='chatBox' className="chatBox bg-slate-800 w-5/6 p-2 m-2">
                 </div>
                 <div id='userBox' className="usersBox bg-slate-800 w-1/6 p-2 m-2">
-                     {Object.keys(usersList).map(key => (
+                    {Object.keys(usersList).map(key => (
                         <div id={key} key={key} onClick={() => getUserName(usersList[key])}>{usersList[key]}</div>
                     ))}
                 </div>
             </div>
             <div className="inputArea flex flex-row h-1/6">
                 <div className="w-1/4 m-2 p-5 bg-slate-800 content-center">
-                    <p> Reciver: </p>
+                    <p> Receiver: </p>
                     <input type="text" className="reciveArea mt-2 bg-gray-900 border w-full" id='reciverInput' />
                 </div>
                 <div className="w-2/4 m-2 p-5 bg-slate-800 content-center">

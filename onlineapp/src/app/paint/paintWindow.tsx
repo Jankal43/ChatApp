@@ -54,8 +54,10 @@ export default function PaintWindow({ toolSelected, colorSelected }: PaintWindow
                         context.stroke();
                     } else if (toolRef.current === "Eraser") {
                         context.strokeStyle = "white";
+                        context.lineWidth =10;
                         context.lineTo(e.offsetX, e.offsetY);
                         context.stroke();
+                        context.lineWidth =1;
                     } else if (toolRef.current === "Line") {
                         if (imageDataRef.current) {
                             context.putImageData(imageDataRef.current, 0, 0);

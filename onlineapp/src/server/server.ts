@@ -10,6 +10,7 @@ type UserDictionary = {
 };
 
 let activeUsers: UserDictionary = {};
+let lastMessages: string[] = []
 
 function findKeyByValue(
   dictionary: UserDictionary,
@@ -47,8 +48,14 @@ io.on("connection", (socket: Socket) => {
 
   socket.on("send-message", ({ message, user }) => {
     console.log("Received message:", message, "from user:", user);
+    if (lastMessages.length >= 5) {
+      lastMessages.shift();
+    }
+    lastMessages.push(user + ": " + message);
+    console.log(lastMessages);
     socket.broadcast.emit("recive-message", { message, user });
   });
+
 
   socket.on("send-image", (data) => {
     socket.broadcast.emit("recive-image", data);
