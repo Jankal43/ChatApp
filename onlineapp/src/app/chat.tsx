@@ -8,20 +8,8 @@ export default function Chat() {
 
     const [usersList, setUsersList] = useState<UsersListType>({});
 
-    function saveMessages(message: string, user: string, isPrivate: boolean) {
-        const existingMessages = JSON.parse(localStorage.getItem("messages") || "[]");
-
-        if (existingMessages.length >= 5) {
-            existingMessages.shift(); // Usuń najstarszą wiadomość
-        }
-
-        existingMessages.push({ message, user, isPrivate });
-        localStorage.setItem("messages", JSON.stringify(existingMessages));
-    }
-
     function displayMessage(message: string, user: string, isPrivate: boolean) {
         const div = document.createElement("div");
-
         if (isPrivate) {
             div.textContent = `(Private message) ${user}: ${message}`;
             div.classList.add('bg-slate-900');
@@ -31,8 +19,7 @@ export default function Chat() {
             document.getElementById("chatBox")?.append(div);
         }
 
-        // Zapisz wiadomość w localStorage
-        saveMessages(message, user, isPrivate);
+
     }
 
     function getUserName(userName: string) {
@@ -64,7 +51,6 @@ export default function Chat() {
                 displayMessage(message, user, true);
                 socket.emit('private-message', { message, receiver, user });
             }
-
             messageInput.value = '';
         }
     }
@@ -97,12 +83,23 @@ export default function Chat() {
     }, []);
 
     useEffect(() => {
-        // Odczytaj zapisane wiadomości z localStorage po załadowaniu komponentu
-        const savedMessages = JSON.parse(localStorage.getItem("messages") || "[]");
+        console.log("Loaded");
 
-        savedMessages.forEach((msg: any) => {
-            displayMessage(msg.message, msg.user, msg.isPrivate);
+        const userElement = document.getElementById('username');
+        const user = userElement ? userElement.textContent || '' : '';
+
+        socket.emit('user-reload', { user });
+        socket.on('chat-history', (data) => {
+            if(data){
+                data.forEach((message:any)=>{
+                    displayMessage(message[0], message[1], message[2]);
+                })
+            }
         });
+
+        return () => {
+            socket.off('chat-history');
+        };
     }, []);
 
     return (
