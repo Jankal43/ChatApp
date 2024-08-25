@@ -7,6 +7,7 @@ export default function Page() {
     const [toolSelected, setToolSelected] = useState("");
     const [colorSelected, setColorSelected] = useState("black");
     const [previousToolSelected, setPreviousToolSelected] = useState("");
+    const [previousColorSelected, setPreviousColorSelected] = useState("");
 
 
 
@@ -18,7 +19,11 @@ export default function Page() {
             colorSelected={colorSelected}
             setColorSelected={setColorSelected}
             previousToolSelected={previousToolSelected}
-            setPreviousToolSelected={setPreviousToolSelected}        />
+            setPreviousToolSelected={setPreviousToolSelected}
+            previousColorSelected={previousColorSelected}
+            setPreviousColorSelected={setPreviousColorSelected}
+
+        />
         <PaintWindow
             toolSelected={toolSelected}
             colorSelected={colorSelected}

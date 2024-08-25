@@ -105,7 +105,7 @@ export default function Chat() {
     return (
         <div className="p-2 m-2 h-screen">
             <div className="messagesArea flex flex-row h-4/6">
-                <div id='chatBox' className="chatBox bg-slate-800 w-5/6 p-2 m-2">
+                <div id='chatBox' className="chatBox bg-slate-800 w-5/6 p-2 m-2 overflow-y-auto overflow-x-auto">
                 </div>
                 <div id='userBox' className="usersBox bg-slate-800 w-1/6 p-2 m-2">
                     {Object.keys(usersList).map(key => (
