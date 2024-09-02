@@ -4,17 +4,20 @@ import socket from "../../socket";
 interface PaintWindowProps {
     toolSelected: string;
     colorSelected: string;
+    brushSize: number;
 }
 
-export default function PaintWindow({ toolSelected, colorSelected }: PaintWindowProps) {
+export default function PaintWindow({ toolSelected, colorSelected, brushSize }: PaintWindowProps) {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const toolRef = useRef(toolSelected);
     const colorRef = useRef(colorSelected);
+    const brushSizeRef = useRef(brushSize);
 
     const startX = useRef<number>(0);
     const startY = useRef<number>(0);
     const isDrawingRef = useRef<boolean>(false);
     const imageDataRef = useRef<ImageData | null>(null);
+
 
     useEffect(() => {
         toolRef.current = toolSelected;
@@ -22,20 +25,27 @@ export default function PaintWindow({ toolSelected, colorSelected }: PaintWindow
     }, [toolSelected, colorSelected]);
 
     useEffect(() => {
+        brushSizeRef.current = brushSize;
+    }, [brushSize]);
+
+
+    useEffect(() => {
         const canvas = canvasRef.current;
 
         if (canvas) {
             const context = canvas.getContext("2d", { willReadFrequently: true });
-
-
             if (context) {
                 canvas.width = canvas.offsetWidth;
                 canvas.height = canvas.offsetHeight;
+
+
 
                 const startDrawing = (e: MouseEvent) => {
                     isDrawingRef.current = true;
                     startX.current = e.offsetX;
                     startY.current = e.offsetY;
+
+                    context.lineWidth = brushSizeRef.current;
 
                     if (toolRef.current === "Line" || toolRef.current === "Rectangle" || toolRef.current === "Triangle" || toolRef.current==="Circle") {
                         imageDataRef.current = context.getImageData(0, 0, canvas.width, canvas.height);
@@ -54,10 +64,8 @@ export default function PaintWindow({ toolSelected, colorSelected }: PaintWindow
                         context.stroke();
                     } else if (toolRef.current === "Eraser") {
                         context.strokeStyle = "white";
-                        context.lineWidth =10;
                         context.lineTo(e.offsetX, e.offsetY);
                         context.stroke();
-                        context.lineWidth =1;
                     } else if (toolRef.current === "Line") {
                         if (imageDataRef.current) {
                             context.putImageData(imageDataRef.current, 0, 0);

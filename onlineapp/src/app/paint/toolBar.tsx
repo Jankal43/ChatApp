@@ -10,6 +10,8 @@ interface ToolBarProps {
     setPreviousToolSelected: React.Dispatch<React.SetStateAction<string>>;
     previousColorSelected: string;
     setPreviousColorSelected: React.Dispatch<React.SetStateAction<string>>;
+    brushSize: number;
+    setBrushSize: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export default function ToolBar({
@@ -21,6 +23,8 @@ export default function ToolBar({
                                     setPreviousToolSelected,
                                     previousColorSelected,
                                     setPreviousColorSelected,
+                                    brushSize,
+                                    setBrushSize,
                                 }: ToolBarProps) {
 
     useEffect(() => {
@@ -34,6 +38,12 @@ export default function ToolBar({
         document.getElementById(previousColorSelected)?.classList.remove("scale-125");
         setPreviousColorSelected(colorSelected);
     }, [colorSelected]);
+
+
+
+    const handleBrushSizeChange = (event: any) => {
+        setBrushSize(parseInt(event.target.value));
+    };
 
     return (
         <div className="font-sans toolBar flex-grow w-1/6 bg-gray-800 m-5 p-5 h-5/6">
@@ -144,12 +154,14 @@ export default function ToolBar({
                     <select
                         id="brushSize"
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-3/6 p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        onChange={handleBrushSizeChange}
                     >
-                        <option selected>12</option>
-                        <option value="15">15</option>
+                        <option value="1">1</option>
+                        <option value="6">6</option>
+                        <option value="12">12</option>
                         <option value="18">18</option>
-                        <option value="21">21</option>
-                        <option value="25">25</option>
+                        <option value="24">24</option>
+                        <option value="36">36</option>
                     </select>
                 </div>
             </ul>

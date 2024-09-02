@@ -8,7 +8,7 @@ export default function Page() {
     const [colorSelected, setColorSelected] = useState("black");
     const [previousToolSelected, setPreviousToolSelected] = useState("");
     const [previousColorSelected, setPreviousColorSelected] = useState("");
-
+    const [brushSize, setBrushSize] = useState(1);
 
 
     return (
@@ -22,11 +22,13 @@ export default function Page() {
             setPreviousToolSelected={setPreviousToolSelected}
             previousColorSelected={previousColorSelected}
             setPreviousColorSelected={setPreviousColorSelected}
-
+            brushSize={brushSize}
+            setBrushSize={setBrushSize}
         />
         <PaintWindow
             toolSelected={toolSelected}
             colorSelected={colorSelected}
+            brushSize={brushSize}
         />
     </div>
   );
