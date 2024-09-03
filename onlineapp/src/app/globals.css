@@ -72,6 +72,12 @@ body {
   justify-content: center;
 }
 
+.gameContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
 .toolBar ul {
   padding-left: 20px;
   list-style-position: inside;
@@ -81,3 +87,8 @@ body {
   margin-bottom: 5px;
   color: white;
 }
+
+/*.board div {*/
+/*  min-height: 200px;*/
+/*  min-width: 200px;*/
+/*}*/
