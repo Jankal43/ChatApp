@@ -83,8 +83,6 @@ export default function Chat() {
     }, []);
 
     useEffect(() => {
-        console.log("Loaded");
-
         const userElement = document.getElementById('username');
         const user = userElement ? userElement.textContent || '' : '';
 

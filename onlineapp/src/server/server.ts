@@ -15,6 +15,7 @@ type UserChatHistory = {
 
 let activeUsers: UserDictionary = {};
 let userChatHistory: UserChatHistory = {};
+let usersGameSlots = ["Empty slot", "Empty slot"]
 
 function findKeyByValue(
     dictionary: UserDictionary,
@@ -105,20 +106,69 @@ io.on("connection", (socket: Socket) => {
   });
 
 
+  socket.on("player-join", (player)=>{
+    console.log("player join", player);
+    console.log(usersGameSlots)
+    if(usersGameSlots[0] === "Empty slot") {
+      usersGameSlots[0] = player;
+    } else if(usersGameSlots[1] === "Empty slot"){
+      usersGameSlots[1] = player;
+    } else {
+      console.log("All slot reserved");
+    }
+    io.emit("users-game-slots", usersGameSlots);
 
 
+
+  })
+
+  socket.on("player-leave", (player) =>{
+    if(usersGameSlots[0] === player){
+      usersGameSlots[0] = "Empty slot";
+    }else{
+      usersGameSlots[1] = "Empty slot";
+    }
+    io.emit("users-game-slots", usersGameSlots);
+  })
+
+  socket.on("game-load", ()=>{
+    console.log("game loaded")
+    socket.emit("users-game-slots", usersGameSlots);
+  })
 
 
 
 
 
   socket.on("disconnect", () => {
-    console.log("A user disconnected", socket.id);
+    let user = activeUsers[socket.id];
+    console.log("User disconnected:", user, "Socket ID:", socket.id);
+
+    if (!user) {
+      console.log("User was not playing, skipping...");
+      return;
+    }
+
+    if (usersGameSlots[0] === user) {
+      usersGameSlots[0] = "Empty slot";
+    } else if (usersGameSlots[1] === user) {
+      usersGameSlots[1] = "Empty slot";
+    } else {
+      console.log("User was not in the game slots");
+    }
+
+    // Clean up after user
     delete activeUsers[socket.id];
     delete userChatHistory[socket.id];
-    console.log("active users", activeUsers);
+
+    // Emit updated game slots and active users
+    console.log("Updated game slots:", usersGameSlots);
+    io.emit("users-game-slots", usersGameSlots);
+
+    console.log("Updated active users:", activeUsers);
     io.emit("active-users", activeUsers);
   });
+
 });
 
 server.listen(3001, () => {
