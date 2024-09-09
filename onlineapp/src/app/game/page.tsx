@@ -3,17 +3,23 @@ import {useEffect, useState} from 'react';
 import socket from "@/socket";
 
 export default function Page() {
-    const [board, setBoard] = useState(Array(9).fill(''));
+    const [board, setBoard] = useState([]);
     const [yourTurn, setYourTurn] = useState(false);
     const [players, setPlayers] = useState([]);
 
     const username = document.getElementById('username')?.textContent;
 
-    function changeSign(index) {
-        const newBoard = [...board];
-        newBoard[index] = newBoard[index] === '' ? 'X' : newBoard[index];
-        setBoard(newBoard);
+    // function changeSign(index: any) {
+    //     const newBoard = [...board];
+    //     newBoard[index] = newBoard[index] === '' ? 'X' : newBoard[index];
+    //     setBoard(newBoard);
+    // }
+
+    function handleClick(index:any){
+        console.log(index);
+        socket.emit('player-click', {index})
     }
+
     function joinGameHandle(){
         socket.emit('player-join', username);
     }
@@ -31,6 +37,12 @@ export default function Page() {
 
     }, []);
 
+    useEffect(() => {
+        socket.on("load-board", (board) =>{
+            setBoard(board);
+        })
+    }, []);
+
 
 
 
@@ -41,14 +53,14 @@ export default function Page() {
                 <p className="gameInfo text-center m-5 text-2xl font-bold">Wait for players</p>
                 <div className="board grid grid-cols-3 min-h-40 min-w-40 gap-1">
                     {board.map((value, index) => (
-                        <button
+                        <div
                             key={index}
                             className={`g${index} border ${index % 3 !== 2 && 'border-r'} ${index < 6 && 'border-b'} 
                             h-24 w-24 flex items-center justify-center text-4xl`}
-                            onClick={() => changeSign(index)}
+                            onClick={() => handleClick(index)}
                         >
                             {value}
-                        </button>
+                        </div>
                     ))}
                 </div>
             </div>
