@@ -15,10 +15,14 @@ export default function Page() {
     //     setBoard(newBoard);
     // }
 
-    function handleClick(index:any){
-        console.log(index);
-        socket.emit('player-click', {index})
+    function handleClick(index) {
+        if (yourTurn) {
+            socket.emit('player-click', index);
+        } else {
+            console.log("To nie jest Twoja runda!");
+        }
     }
+
 
     function joinGameHandle(){
         socket.emit('player-join', username);
@@ -42,6 +46,26 @@ export default function Page() {
             setBoard(board);
         })
     }, []);
+
+    useEffect(() => {
+        socket.on("board-update", (updatedBoard) => {
+            setBoard(updatedBoard);
+        });
+    }, []);
+
+    useEffect(() => {
+        socket.on("round-update", (currentPlayer) => {
+            console.log("Ruch należy do gracza:", currentPlayer);
+            setYourTurn((currentPlayer === 'X' && players[0] === username) ||
+                (currentPlayer === 'O' && players[1] === username));
+        });
+    }, [players, username]);
+
+
+
+
+
+
 
 
 

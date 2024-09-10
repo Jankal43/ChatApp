@@ -28,21 +28,28 @@ function findKeyByValue(
   }
   return undefined;
 }
-let board = Array(9).fill(''); // Inicjalizacja planszy
+let board = Array(9).fill('');
 
+
+let playerOneRound = true;
 
 function startGame(socket: Socket) {
-  let playerOneRound = true;
-  let board = Array(9).fill(''); // Inicjalizacja planszy
+  io.emit('round-update', playerOneRound ? 'X' : 'O');
 
   socket.on('player-click', (index: number) => {
+    console.log('Kliknięcie gracza na indeksie:', index);
     if (board[index] === '') {
-      board[index] = playerOneRound ? 'X' : 'O'; // Zmiana stanu planszy
-      playerOneRound = !playerOneRound; // Zmiana tury
-      io.emit('board-update', board); // Aktualizacja planszy dla wszystkich
+      console.log('Zaktualizowano planszę dla indeksu:', index);
+      board[index] = playerOneRound ? 'X' : 'O';
+      playerOneRound = !playerOneRound;
+      io.emit('board-update', board);
+      io.emit('round-update', playerOneRound ? 'X' : 'O');
     }
   });
 }
+
+
+
 
 
 
@@ -132,14 +139,12 @@ io.on("connection", (socket: Socket) => {
     } else if(usersGameSlots[1] === "Empty slot"){
       usersGameSlots[1] = player;
       startGame(socket);
+      io.emit('board-update', board);
 
     } else {
       console.log("All slot reserved");
     }
     io.emit("users-game-slots", usersGameSlots);
-
-
-
   })
 
   socket.on("player-leave", (player) =>{
