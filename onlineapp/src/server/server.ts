@@ -17,6 +17,33 @@ let activeUsers: UserDictionary = {};
 let userChatHistory: UserChatHistory = {};
 let usersGameSlots = ["Empty slot", "Empty slot"]
 
+let usersTurn = "";
+let board = Array(9).fill('');
+
+const winningCombinations = [
+  [0, 1, 2], [3, 4, 5], [6, 7, 8],
+  [0, 3, 6], [1, 4, 7], [2, 5, 8],
+  [0, 4, 8], [2, 4, 6]
+];
+
+
+function checkWinner(board: string[]): string | null {
+  for (const combination of winningCombinations) {
+    const [a, b, c] = combination;
+    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+      return board[a];
+    }
+  }
+  if (board.every(cell => cell !== '')) {
+    return "draw";
+  }
+  return null;
+}
+
+
+
+
+
 function findKeyByValue(
     dictionary: UserDictionary,
     value: string
@@ -28,30 +55,6 @@ function findKeyByValue(
   }
   return undefined;
 }
-let board = Array(9).fill('');
-
-
-let playerOneRound = true;
-
-function startGame(socket: Socket) {
-  io.emit('round-update', playerOneRound ? 'X' : 'O');
-
-  socket.on('player-click', (index: number) => {
-    console.log('Kliknięcie gracza na indeksie:', index);
-    if (board[index] === '') {
-      console.log('Zaktualizowano planszę dla indeksu:', index);
-      board[index] = playerOneRound ? 'X' : 'O';
-      playerOneRound = !playerOneRound;
-      io.emit('board-update', board);
-      io.emit('round-update', playerOneRound ? 'X' : 'O');
-    }
-  });
-}
-
-
-
-
-
 
 
 const io = new SocketIOServer(server, {
@@ -136,31 +139,60 @@ io.on("connection", (socket: Socket) => {
     console.log(usersGameSlots)
     if(usersGameSlots[0] === "Empty slot") {
       usersGameSlots[0] = player;
+      usersTurn = usersGameSlots[0];
     } else if(usersGameSlots[1] === "Empty slot"){
       usersGameSlots[1] = player;
-      startGame(socket);
+      console.log("Rozpoczęcie gry");
       io.emit('board-update', board);
-
+      io.emit('round-update', usersTurn === usersGameSlots[0] ? 'X' : 'O');
     } else {
       console.log("All slot reserved");
     }
     io.emit("users-game-slots", usersGameSlots);
   })
 
-  socket.on("player-leave", (player) =>{
-    if(usersGameSlots[0] === player){
+  socket.on('player-click', (index) => {
+    if (board[index] === '') {
+      board[index] = usersTurn === usersGameSlots[0] ? 'X' : 'O';
+      usersTurn = usersTurn === usersGameSlots[0] ? usersGameSlots[1] : usersGameSlots[0];
+
+      const winner = checkWinner(board);
+      if (winner) {
+        if (winner === "draw") {
+          io.emit("game-over", "Remis!");
+        } else {
+          io.emit("game-over", `Zwycięzca: ${winner}`);
+        }
+        io.emit('board-update', board); // Wyślij ostatnią aktualizację planszy
+        board = Array(9).fill(''); // Reset planszy po wysłaniu ostatniego stanu
+      } else {
+        io.emit('board-update', board);
+        io.emit('round-update', usersTurn === usersGameSlots[0] ? 'X' : 'O');
+      }
+    }
+  });
+
+
+
+  socket.on("player-leave", (player) => {
+    console.log("Gracz opuścił grę:", player);
+
+    if (usersGameSlots[0] === player) {
       usersGameSlots[0] = "Empty slot";
-    }else{
+    } else if (usersGameSlots[1] === player) {
       usersGameSlots[1] = "Empty slot";
     }
-    io.emit("users-game-slots", usersGameSlots);
-  })
 
-  socket.on("game-load", ()=>{
-    console.log("game loaded")
-    socket.emit("users-game-slots", usersGameSlots);
-    socket.emit("load-board", board)
-  })
+    // Reset planszy i aktualizacja klientów
+    board = Array(9).fill('');  // Resetujemy planszę
+    usersTurn = "";  // Reset tury
+
+    io.emit("users-game-slots", usersGameSlots);  // Aktualizacja graczy
+    io.emit("board-update", board);  // Reset planszy dla klientów
+    io.emit("round-update", null);  // Reset tury (brak gracza)
+    io.emit("game-over", "Gra została przerwana, oczekiwanie na graczy.");  // Komunikat o zakończeniu gry
+  });
+
 
 
 
