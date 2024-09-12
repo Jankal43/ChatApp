@@ -7,17 +7,16 @@ export default function Page() {
     const [yourTurn, setYourTurn] = useState(false);
     const [players, setPlayers] = useState([]);
     const [currentPlayer, setCurrentPlayer] = useState(null);
-    const [gameStatus, setGameStatus] = useState("Oczekiwanie na graczy");
+    const [gameStatus, setGameStatus] = useState("Waiting for players");
 
 
     const username = document.getElementById('username')?.textContent;
 
     function handleClick(index) {
         if (yourTurn) {
-            console.log("Wysłanie eventu player-click:", index);
             socket.emit('player-click', index);
         } else {
-            console.log("To nie jest Twoja runda!");
+            console.log("Not your turn!");
         }
     }
 
@@ -31,11 +30,9 @@ export default function Page() {
     }
 
     useEffect(() => {
-        console.log("Username:", username);  // Sprawdź, czy `username` ma wartość
         socket.emit("game-load");
 
         socket.on("users-game-slots", (slots) => {
-            console.log("Game slots", slots);
             setPlayers(slots);
         });
     }, [username]);
@@ -43,12 +40,11 @@ export default function Page() {
 
     useEffect(() => {
         socket.on("board-update", (updatedBoard) => {
-            console.log("Aktualizacja planszy:", updatedBoard);
             setBoard(updatedBoard);
         });
 
         socket.on("round-update", (playerTurn) => {
-            console.log("Ruch należy do gracza:", playerTurn);
+            console.log("Player:", playerTurn);
             setCurrentPlayer(playerTurn);
 
             setYourTurn((playerTurn === 'X' && players[0] === username) ||
@@ -56,8 +52,7 @@ export default function Page() {
         });
 
         socket.on("game-over", (message) => {
-            console.log("Gra zakończona:", message);
-            setGameStatus(message); // Ustaw wynik gry
+            setGameStatus(message);
         });
     }, [players, username]);
 
@@ -91,10 +86,10 @@ export default function Page() {
                 className="bg-slate-800 text-slate-100 font-sans flex-grow w-1/6 m-5 p-5 h-5/6 flex flex-col items-center justify-center">
                 <div className="p-1 m-1 border text-center mb-5">
                     <div className="player1 flex items-center justify-center">
-                        {players[0] || "Gracz 1 (X)"}
+                        {players[0] || "Player 1 (X)"}
                     </div>
                     <div className="player2 p-1 m-1 border-t-2 flex items-center justify-center">
-                        {players[1] || "Gracz 2 (O)"}
+                        {players[1] || "Player 2 (O)"}
                     </div>
                 </div>
 
@@ -102,13 +97,13 @@ export default function Page() {
                     <button className="p-1 border rounded-md text-center bg-red-700 font-bold"
                             onClick={leaveGameHandle}
                     >
-                        Opuść Grę
+                        Quit Game
                     </button>
                 ) : (
                     <button className="p-1 border rounded-md text-center bg-green-700 font-bold"
                             onClick={joinGameHandle}
                     >
-                        Dołącz do Gry
+                        Join Game
                     </button>
                 )}
             </div>

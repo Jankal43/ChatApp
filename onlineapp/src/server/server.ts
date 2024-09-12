@@ -40,10 +40,6 @@ function checkWinner(board: string[]): string | null {
   return null;
 }
 
-
-
-
-
 function findKeyByValue(
     dictionary: UserDictionary,
     value: string
@@ -163,8 +159,8 @@ io.on("connection", (socket: Socket) => {
         } else {
           io.emit("game-over", `Zwycięzca: ${winner}`);
         }
-        io.emit('board-update', board); // Wyślij ostatnią aktualizację planszy
-        board = Array(9).fill(''); // Reset planszy po wysłaniu ostatniego stanu
+        io.emit('board-update', board);
+        board = Array(9).fill('');
       } else {
         io.emit('board-update', board);
         io.emit('round-update', usersTurn === usersGameSlots[0] ? 'X' : 'O');
@@ -183,14 +179,12 @@ io.on("connection", (socket: Socket) => {
       usersGameSlots[1] = "Empty slot";
     }
 
-    // Reset planszy i aktualizacja klientów
-    board = Array(9).fill('');  // Resetujemy planszę
-    usersTurn = "";  // Reset tury
-
-    io.emit("users-game-slots", usersGameSlots);  // Aktualizacja graczy
-    io.emit("board-update", board);  // Reset planszy dla klientów
-    io.emit("round-update", null);  // Reset tury (brak gracza)
-    io.emit("game-over", "Gra została przerwana, oczekiwanie na graczy.");  // Komunikat o zakończeniu gry
+    board = Array(9).fill('');
+    usersTurn = "";
+    io.emit("users-game-slots", usersGameSlots);
+    io.emit("board-update", board);
+    io.emit("round-update", null);
+    io.emit("game-over", "Gra została przerwana, oczekiwanie na graczy.");
   });
 
 
@@ -215,11 +209,9 @@ io.on("connection", (socket: Socket) => {
       console.log("User was not in the game slots");
     }
 
-    // Clean up after user
     delete activeUsers[socket.id];
     delete userChatHistory[socket.id];
 
-    // Emit updated game slots and active users
     console.log("Updated game slots:", usersGameSlots);
     io.emit("users-game-slots", usersGameSlots);
 
